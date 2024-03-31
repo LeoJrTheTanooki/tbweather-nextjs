@@ -196,8 +196,8 @@ const HomePageComponent = () => {
       setWeather(weatherData);
       setForecast(forecastData);
 
-      console.log(weatherData);
-      console.log(forecastData);
+    //   console.log(weatherData);
+    //   console.log(forecastData);
 
       // Assigning to variables for readability
       let forecastList = forecastData.list.filter((obj) => {

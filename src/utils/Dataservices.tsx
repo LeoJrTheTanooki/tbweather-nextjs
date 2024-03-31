@@ -2,7 +2,6 @@
 import { Iweather } from "../Interfaces/Interfaces";
 import { IForecast } from "../Interfaces/Interfaces";
 const apiKey = process.env.NEXT_PUBLIC_API_KEY; 
-// const apiKey = 'acfbb5d1a1b814a2931225281e2d44da'; 
 
 export const getWeather = async (location: string = 'stockton') => {
   console.log(process.env.REACT_APP_API_KEY)

@@ -4,7 +4,6 @@ import { IForecast } from "../Interfaces/Interfaces";
 const apiKey = process.env.NEXT_PUBLIC_API_KEY; 
 
 export const getWeather = async (location: string = 'stockton') => {
-  console.log(process.env.REACT_APP_API_KEY)
   const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=imperial`);
   const data: Iweather = await response.json();
   return data;

@@ -4,6 +4,7 @@ import { Container, Input, Text } from "nes-ui-react";
 import { useEffect, useState } from "react";
 import { IForecast, Iweather } from "../../Interfaces/Interfaces";
 import { getForecast, getWeather } from "@/utils/Dataservices";
+// import { useLocalStorage } from "next-localstorage"
 
 // Call a local storage item called dark-mode
 // If dark-mode is nonexistent, create the item and set its key to false
@@ -92,9 +93,7 @@ const HomePageComponent = () => {
   };
 
   const [isClient, setIsClient] = useState<boolean>(false);
-
   const [weather, setWeather] = useState<Iweather>(weatherDefault);
-
   const [forecast, setForecast] = useState<IForecast>(forecastDefault);
 
   const [iconDay2, setIconDay2] = useState<string>("");
@@ -117,10 +116,7 @@ const HomePageComponent = () => {
   const [dtDay4, setDtDay4] = useState<number>(0);
   const [dtDay5, setDtDay5] = useState<number>(0);
 
-  // The new document.getElementbyId
-  //   const searchValue = document.getElementById(
-  //     "searchValue"
-  //   ) as HTMLInputElement;
+  const [searchInput, setSearchInput] = useState<string>("");
 
   const currentIcon = (iconCodeLocation: string) => {
     switch (iconCodeLocation) {
@@ -289,13 +285,17 @@ const HomePageComponent = () => {
   return (
     <div className="grid justify-center">
       <div className="flex items-center justify-end">
-        {/* <Input type="search" name="" id="searchValue" />
-        <a onClick={() => getData(searchValue.value)}>
-          <img className="h-16 w-16" src='/assets/Search.png' alt="" />
-        </a> */}
+        <Input
+          type="search"
+          name="searchInput"
+          id="searchInput"
+          onChange={(e) => setSearchInput(e)}
+        ></Input>{" "}
+        <a onClick={() => getData(searchInput)}>
+          <img className="h-16 w-16" src="/assets/Search.png" alt="" />
+        </a>
       </div>
       <Container className="w-max">
-        {/* <Input ref={inputRef} type="text" name="locationInput"></Input> */}
         <div className="grid grid-cols-2 min-[460px]:grid-cols-4 justify-items-center gap-y-8">
           <div className=" col-span-2 min-[460px]:col-span-4 grid md:grid-cols-3 justify-items-start gap-y-8 w-full">
             <div className="order-2 md:order-1 justify-self-center">
@@ -308,7 +308,7 @@ const HomePageComponent = () => {
             <div className="order-3 md:order-2 md:col-span-1 justify-self-center">
               <Text size="xlarge" className="underline pressStart2P">
                 {isClient ? weather && weather.name : "???"}
-                {/* , {isClient ? weather && weather.sys.country}{" "} */}
+                , {isClient ? weather && weather.sys.country : "???"}{" "}
               </Text>
               <Text size="xlarge">
                 {isClient ? weather && weather.weather[0].main : "???"}

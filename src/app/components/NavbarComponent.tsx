@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import images from "../../../public/assets/images";
 import {
   Button,
+  Colors,
   IconButton,
   Menu,
   PixelIcon,
@@ -14,44 +15,50 @@ import {
 } from "nes-ui-react";
 
 const NavbarComponent = () => {
+  const [isClient, setIsClient] = useState<boolean>(false);
 
-  // const darkCheck = () => {
-  //   // Checks if dark-mode exists in local storage, returns are to be used for the useState
-  //   if (localStorage.getItem("dark-mode")) {
-  //     // If it does, run this check to see its current state
-  //     if (localStorage.getItem("dark-mode") === "true") {
-  //       // Applies Flowbite's dark mode alongside NES-UI's
-  //       document.documentElement.classList.add("dark");
-  //       document.body.classList.add("dark");
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //   }
-  //   // If it doesn't, make it exist and initialize it as false to start at light mode
-  //   else {
-  //     localStorage.setItem("dark-mode", "false");
-  //     return false;
-  //   }
-  // };
+  const darkCheck = () => {
+    // Checks if dark-mode exists in local storage, returns are to be used for the useState
 
-  // const [darkMode, setDarkMode] = useState<boolean>(darkCheck);
+    if (localStorage.getItem("dark-mode")) {
+      // If it does, run this check to see its current state
+      if (localStorage.getItem("dark-mode") === "true") {
+        // Applies Flowbite's dark mode alongside NES-UI's
+        document.documentElement.classList.add("dark");
+        document.body.classList.add("dark");
+        setDarkMode(true);
+      } else {
+        setDarkMode(false);
+      }
+    }
+    // If it doesn't, make it exist and initialize it as false to start at light mode
+    else {
+      localStorage.setItem("dark-mode", "false");
+      setDarkMode(false);
+    }
+  };
 
-  // const toggleDarkMode = useCallback(() => {
-  //   setDarkMode(!darkMode);
-  //   if (localStorage.getItem("dark-mode") === "true") {
-  //     localStorage.setItem("dark-mode", "false");
-  //     document.documentElement.classList.remove("dark");
-  //     document.body.classList.remove("dark");
-  //     // console.log(document.body.style.backgroundImage);
-  //   } else {
-  //     document.documentElement.classList.add("dark");
-  //     document.body.classList.add("dark");
-  //     localStorage.setItem("dark-mode", "true");
-  //   }
-  // }, [darkMode]);
+  const [darkMode, setDarkMode] = useState<boolean>(false);
 
-  // useEffect(() => setDarkModeActivation(darkMode), [darkMode]);
+  const toggleDarkMode = useCallback(() => {
+    setDarkMode(!darkMode);
+    if (localStorage.getItem("dark-mode") === "true") {
+      localStorage.setItem("dark-mode", "false");
+      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark");
+      // console.log(document.body.style.backgroundImage);
+    } else {
+      document.documentElement.classList.add("dark");
+      document.body.classList.add("dark");
+      localStorage.setItem("dark-mode", "true");
+    }
+  }, [darkMode]);
+
+  useEffect(() => {
+    // setIsClient(true);
+    setDarkModeActivation(darkMode);
+    darkCheck();
+  }, [darkMode]);
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -59,13 +66,22 @@ const NavbarComponent = () => {
     <>
       <Toolbar
         // Experimented using hexes to adjust colors
-        // style={{ backgroundColor: Colors.color3B }}
+        style={
+          darkMode
+            ? { backgroundColor: Colors.color0A, borderBottom: `solid 4px ${Colors.color0F}` }
+            : { backgroundColor: Colors.color3B, borderBottom: `solid 4px ${Colors.color0F}` }
+        }
         borderless
         roundedCorners={false}
-        className=" bg-[#99dd99] dark:bg-[#004444]"
+        className=" border"
       >
         <div>
-          <img id="testId" className="h-16 w-16" src='/assets/mainLogo.png' alt="" />
+          <img
+            id="testId"
+            className="h-16 w-16"
+            src="/assets/mainLogo.png"
+            alt=""
+          />
           <Text className="self-center" size="xlarge">
             TBWeather
           </Text>
@@ -77,18 +93,18 @@ const NavbarComponent = () => {
          >
           <img className="h-16 w-16" src={images.searchIcon} alt="" />
         </a> */}
-        {/* <IconButton onClick={toggleDarkMode} color="warning">
+        <IconButton onClick={toggleDarkMode} color="warning">
           <PixelIcon
             name={darkMode ? "pixelicon-sun" : "pixelicon-moon"}
             size="medium"
           />
-        </IconButton> */}
+        </IconButton>
         <a
-        title="Favorites Dropdown Coming Soon"
+          title="Favorites Dropdown Coming Soon"
           className=" opacity-50"
           // onClick={() => setShowMoreMenu(true)}
         >
-          <img className="h-16 w-16" src='/assets/Save.png' alt="" />
+          <img className="h-16 w-16" src="/assets/Save.png" alt="" />
         </a>
       </Toolbar>
       <div className=" flex justify-end">

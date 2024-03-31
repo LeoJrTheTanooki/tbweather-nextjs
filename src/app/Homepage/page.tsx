@@ -2,7 +2,6 @@
 
 import { Container, Input, Text } from "nes-ui-react";
 import { useEffect, useState } from "react";
-// import images from "../images";
 import { IForecast, Iweather } from "../../Interfaces/Interfaces";
 import { getForecast, getWeather } from "@/utils/Dataservices";
 
@@ -91,6 +90,8 @@ const HomePageComponent = () => {
       timezone: 0,
     },
   };
+
+  const [isClient, setIsClient] = useState<boolean>(false);
 
   const [weather, setWeather] = useState<Iweather>(weatherDefault);
 
@@ -186,8 +187,8 @@ const HomePageComponent = () => {
   };
 
   const hourConvert = (hour: number) => {
-
-  }
+    // if(hour )
+  };
 
   const getData = async (search: string = "Stockton") => {
     const weatherData = await getWeather(search);
@@ -196,8 +197,8 @@ const HomePageComponent = () => {
       setWeather(weatherData);
       setForecast(forecastData);
 
-    //   console.log(weatherData);
-    //   console.log(forecastData);
+      //   console.log(weatherData);
+      //   console.log(forecastData);
 
       // Assigning to variables for readability
       let forecastList = forecastData.list.filter((obj) => {
@@ -281,6 +282,7 @@ const HomePageComponent = () => {
   };
 
   useEffect(() => {
+    setIsClient(true);
     getData();
   }, []);
 
@@ -299,44 +301,51 @@ const HomePageComponent = () => {
             <div className="order-2 md:order-1 justify-self-center">
               <img
                 className="h-64 w-64"
-                src={currentIcon(weather.weather[0].icon)}
+                src={isClient ? currentIcon(weather.weather[0].icon) : "???"}
                 alt="???"
               />
             </div>
             <div className="order-3 md:order-2 md:col-span-1 justify-self-center">
               <Text size="xlarge" className="underline pressStart2P">
-                {weather && weather.name}
-                {/* , {weather && weather.sys.country}{" "} */}
+                {isClient ? weather && weather.name : "???"}
+                {/* , {isClient ? weather && weather.sys.country}{" "} */}
               </Text>
-              <Text size="xlarge">{weather && weather.weather[0].main}</Text>
               <Text size="xlarge">
-                {weather && Math.round(weather.main.temp)}
+                {isClient ? weather && weather.weather[0].main : "???"}
+              </Text>
+              <Text size="xlarge">
+                {isClient ? weather && Math.round(weather.main.temp) : "0"}
                 °F
               </Text>
               <Text size="xlarge">
                 MAX:
-                {weather && Math.round(weather.main.temp_max)}° MIN:
-                {weather && Math.round(weather.main.temp_min)}°
+                {isClient ? weather && Math.round(weather.main.temp_max) : "0"}°
+                MIN:
+                {isClient ? weather && Math.round(weather.main.temp_min) : "0"}°
               </Text>
               <Text size="xlarge">
                 HUM:
-                {weather && weather.main.humidity}%
+                {isClient ? weather && weather.main.humidity : "0"}%
               </Text>
               <Text size="xlarge">
-                {weather &&
-                  new Date(
-                    (weather.dt + weather.timezone) * 1000
-                  ).toDateString()}
-              </Text>
-              <Text size="xlarge">
-                {weather &&
-                  new Date(
-                    (weather.dt + weather.timezone) * 1000
-                  ).getUTCHours() +
-                    ":" +
+                {isClient
+                  ? weather &&
                     new Date(
                       (weather.dt + weather.timezone) * 1000
-                    ).getUTCMinutes()}
+                    ).toDateString()
+                  : "Wed Dec 31 1969"}
+              </Text>
+              <Text size="xlarge">
+                {isClient
+                  ? weather &&
+                    new Date(
+                      (weather.dt + weather.timezone) * 1000
+                    ).getUTCHours() +
+                      ":" +
+                      new Date(
+                        (weather.dt + weather.timezone) * 1000
+                      ).getUTCMinutes()
+                  : "00:00"}
               </Text>
             </div>
             <div className="order-1 md:order-3 justify-self-end">
@@ -353,72 +362,88 @@ const HomePageComponent = () => {
             <div className="flex justify-center">
               <img
                 className="h-16 w-16"
-                src={currentIcon(iconDay2)}
+                src={isClient ? currentIcon(iconDay2) : "/assets/unknown.png"}
                 alt="???"
               />
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{currentDay(new Date(dtDay2).getDay())}</Text>
+              <Text size="xlarge">
+                {isClient ? currentDay(new Date(dtDay2).getDay()) : "Wed."}
+              </Text>
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{Math.round(tempDay2)}°</Text>
+              <Text size="xlarge">
+                {isClient ? Math.round(tempDay2) : "0"}°
+              </Text>
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{humDay2}%</Text>
+              <Text size="xlarge">{isClient ? humDay2 : "0"}%</Text>
             </div>
           </Container>
           <Container roundedCorners className="p-3 text-center flex flex-col">
             <div className="flex justify-center">
               <img
                 className="h-16 w-16"
-                src={currentIcon(iconDay3)}
+                src={isClient ? currentIcon(iconDay3) : "/assets/unknown.png"}
                 alt="???"
               />
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{currentDay(new Date(dtDay3).getDay())}</Text>{" "}
+              <Text size="xlarge">
+                {isClient ? currentDay(new Date(dtDay3).getDay()) : "Wed."}
+              </Text>{" "}
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{Math.round(tempDay3)}°</Text>
+              <Text size="xlarge">
+                {isClient ? Math.round(tempDay3) : "0"}°
+              </Text>
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{humDay3}%</Text>
+              <Text size="xlarge">{isClient ? humDay3 : "0"}%</Text>
             </div>
           </Container>
           <Container roundedCorners className="p-3 text-center flex flex-col">
             <div className="flex justify-center">
               <img
                 className="h-16 w-16"
-                src={currentIcon(iconDay4)}
+                src={isClient ? currentIcon(iconDay4) : "/assets/unknown.png"}
                 alt="???"
               />
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{currentDay(new Date(dtDay4).getDay())}</Text>{" "}
+              <Text size="xlarge">
+                {isClient ? currentDay(new Date(dtDay4).getDay()) : "Wed."}
+              </Text>{" "}
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{Math.round(tempDay4)}°</Text>
+              <Text size="xlarge">
+                {isClient ? Math.round(tempDay4) : "0"}°
+              </Text>
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{humDay4}%</Text>
+              <Text size="xlarge">{isClient ? humDay4 : "0"}%</Text>
             </div>
           </Container>
           <Container roundedCorners className="p-3 text-center flex flex-col">
             <div className="flex justify-center">
               <img
                 className="h-16 w-16"
-                src={currentIcon(iconDay5)}
+                src={isClient ? currentIcon(iconDay5) : "/assets/unknown.png"}
                 alt="???"
               />
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{currentDay(new Date(dtDay5).getDay())}</Text>{" "}
+              <Text size="xlarge">
+                {isClient ? currentDay(new Date(dtDay5).getDay()) : "Wed."}
+              </Text>
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{Math.round(tempDay5)}°</Text>
+              <Text size="xlarge">
+                {isClient ? Math.round(tempDay5) : "0"}°
+              </Text>
             </div>
             <div className="flex justify-center">
-              <Text size="xlarge">{humDay5}%</Text>
+              <Text size="xlarge">{isClient ? humDay5 : "0"}%</Text>
             </div>
           </Container>
         </div>

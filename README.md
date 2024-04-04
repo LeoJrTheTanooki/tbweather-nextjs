@@ -1,5 +1,5 @@
 #### Name Leo Garcia
-#### Project Name: Social Media Dashboard
+#### Project Name: TBWeather on Next.js
 #### Date: 3/31/2024
 #### Description: A weather app built using Next.JS
 #### Peer Reviewer: Zachary Dressel

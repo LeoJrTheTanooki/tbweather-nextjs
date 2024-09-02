@@ -1,9 +1,10 @@
 "use client";
 
-import { Container, Input, Text } from "nes-ui-react";
-import { useEffect, useState } from "react";
+import { Container, Input, Text, setDarkModeActivation } from "nes-ui-react";
+import { useCallback, useEffect, useState } from "react";
 import { IForecast, Iweather } from "../../Interfaces/Interfaces";
 import { getForecast, getWeather } from "@/utils/Dataservices";
+import NavbarComponent from "../components/NavbarComponent";
 // import { useLocalStorage } from "next-localstorage"
 
 // Call a local storage item called dark-mode
@@ -52,49 +53,17 @@ const HomePageComponent = () => {
     id: 0,
     name: "???",
     cod: 0,
-  };
-
-  const forecastDefault: IForecast = {
-    cod: 0,
-    list: [
-      {
-        dt: 0,
-        main: {
-          temp: 0,
-          feels_like: 0,
-          temp_min: 0,
-          temp_max: 0,
-          pressure: 0,
-          sea_level: 0,
-          grnd_level: 0,
-          humidity: 0,
-          temp_kf: 0,
-        },
-        weather: [],
-        clouds: {
-          all: 0,
-        },
-        wind: {
-          speed: 0,
-          deg: 0,
-          gust: 0,
-        },
-        visibility: 0,
-        pop: 0,
-        sys: {
-          pod: "???",
-        },
-        dt_txt: "???",
-      },
-    ],
-    city: {
-      timezone: 0,
+    coord: {
+      lat: 0,
+      lon: 0,
     },
   };
 
   const [isClient, setIsClient] = useState<boolean>(false);
   const [weather, setWeather] = useState<Iweather>(weatherDefault);
-  const [forecast, setForecast] = useState<IForecast>(forecastDefault);
+  const [currentTime, setCurrentTime] = useState<string>("04:00 PM");
+  const [savedLocales, setSavedLocales] = useState<any[]>([]);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
 
   const [iconDay2, setIconDay2] = useState<string>("");
   const [iconDay3, setIconDay3] = useState<string>("");
@@ -117,8 +86,11 @@ const HomePageComponent = () => {
   const [dtDay5, setDtDay5] = useState<number>(0);
 
   const [searchInput, setSearchInput] = useState<string>("");
+  const [storageDependancy, setStorageDependancy] = useState<boolean>(false);
 
   const currentIcon = (iconCodeLocation: string) => {
+    // Figure out how to import functions from other components at some point
+
     switch (iconCodeLocation) {
       case "01d":
         return "/assets/clear.png";
@@ -182,8 +154,28 @@ const HomePageComponent = () => {
     }
   };
 
-  const hourConvert = (hour: number) => {
-    // if(hour )
+  const timeConvert = (hour: number, minute: number) => {
+    let amPm = " AM";
+    if (hour > 12) {
+      amPm = " PM";
+    }
+    if (hour === 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour = hour - 12;
+    }
+
+    let stringHour = hour.toString();
+    let stringMinute = minute.toString();
+
+    if (hour < 10) {
+      stringHour = "0" + stringHour;
+    }
+    if (minute < 10) {
+      stringMinute = "0" + stringMinute;
+    }
+
+    return stringHour + ":" + stringMinute + amPm;
   };
 
   const getData = async (search: string = "Stockton") => {
@@ -191,9 +183,8 @@ const HomePageComponent = () => {
     const forecastData = await getForecast(search);
     if (weatherData.cod != 404) {
       setWeather(weatherData);
-      setForecast(forecastData);
 
-      //   console.log(weatherData);
+      console.log(weatherData);
       //   console.log(forecastData);
 
       // Assigning to variables for readability
@@ -219,6 +210,18 @@ const HomePageComponent = () => {
       let forecastDay = new Date(
         (forecastList[0].dt + forecastData.city.timezone) * 1000
       ).getDay();
+
+      let todaysHour = new Date(
+        (weatherData.dt + weatherData.timezone) * 1000
+      ).getUTCHours();
+
+      let todaysMinute = new Date(
+        (weatherData.dt + weatherData.timezone) * 1000
+      ).getUTCMinutes();
+
+      setCurrentTime(timeConvert(todaysHour, todaysMinute));
+
+      // console.log(new Date((weather.dt + weather.timezone) * 1000));
 
       if (forecastDay !== todaysDay + 1) {
         forecastList.shift();
@@ -253,7 +256,6 @@ const HomePageComponent = () => {
       setDtDay5((day5Data.dt + forecastData.city.timezone) * 1000);
     } else {
       setWeather(weatherDefault);
-      setForecast(forecastDefault);
 
       setIconDay2("?");
       setIconDay3("?");
@@ -274,6 +276,7 @@ const HomePageComponent = () => {
       setDtDay3(0);
       setDtDay4(0);
       setDtDay5(0);
+      setCurrentTime(timeConvert(16, 0));
     }
   };
 
@@ -281,6 +284,17 @@ const HomePageComponent = () => {
     setIsClient(true);
     getData();
   }, []);
+
+  useEffect(() => {
+    const localStorageData = localStorage.getItem("saved-locations");
+    if (localStorageData) {
+      setSavedLocales(JSON.parse(localStorageData));
+    }
+  }, [storageDependancy]);
+
+  useEffect(() => {
+    console.log(savedLocales);
+  }, [savedLocales]);
 
   return (
     <div className="grid justify-center">
@@ -290,7 +304,7 @@ const HomePageComponent = () => {
           name="searchInput"
           id="searchInput"
           onChange={(e) => setSearchInput(e)}
-        ></Input>{" "}
+        />
         <a onClick={() => getData(searchInput)}>
           <img className="h-16 w-16" src="/assets/Search.png" alt="" />
         </a>
@@ -307,8 +321,8 @@ const HomePageComponent = () => {
             </div>
             <div className="order-3 md:order-2 md:col-span-1 justify-self-center">
               <Text size="xlarge" className="underline pressStart2P">
-                {isClient ? weather && weather.name : "???"}
-                , {isClient ? weather && weather.sys.country : "???"}{" "}
+                {isClient ? weather && weather.name : "???"},{" "}
+                {isClient ? weather && weather.sys.country : "???"}{" "}
               </Text>
               <Text size="xlarge">
                 {isClient ? weather && weather.weather[0].main : "???"}
@@ -336,23 +350,52 @@ const HomePageComponent = () => {
                   : "Wed Dec 31 1969"}
               </Text>
               <Text size="xlarge">
-                {isClient
-                  ? weather &&
-                    new Date(
-                      (weather.dt + weather.timezone) * 1000
-                    ).getUTCHours() +
-                      ":" +
-                      new Date(
-                        (weather.dt + weather.timezone) * 1000
-                      ).getUTCMinutes()
-                  : "00:00"}
+                {isClient ? weather && currentTime : "04:00 PM"}
               </Text>
             </div>
-            <div className="order-1 md:order-3 justify-self-end">
-              <a title="Favorites Coming Soon">
+            <div
+              className="order-1 md:order-3 justify-self-end"
+              onClick={() => {
+                let localCheck;
+                for (let index = 0; index < savedLocales.length; index++) {
+                  const element = savedLocales[index];
+                  const currentWeather = {
+                    name: `${weather.name}, ${weather.sys.country}`,
+                    coord: {
+                      lat: weather.coord.lat,
+                      lon: weather.coord.lon,
+                    },
+                  };
+                  if (
+                    JSON.stringify(element) == JSON.stringify(currentWeather)
+                  ) {
+                    localCheck = true;
+                    break;
+                  }
+                }
+                if (!localCheck) {
+                  savedLocales.push({
+                    name: `${weather.name}, ${weather.sys.country}`,
+                    coord: {
+                      lat: weather.coord.lat,
+                      lon: weather.coord.lon,
+                    },
+                  });
+                  localStorage.setItem(
+                    "saved-locations",
+                    JSON.stringify(savedLocales)
+                  );
+                  setIsSaved(true)
+                } else {
+                  setIsSaved(false)
+                }
+                setStorageDependancy(!storageDependancy);
+              }}
+            >
+              <a>
                 <img
-                  className="h-16 w-16 opacity-50"
-                  src="/assets/FavStar1.png"
+                  className="h-16 w-16"
+                  src="/assets/unfavStar.png"
                   alt="???"
                 />
               </a>

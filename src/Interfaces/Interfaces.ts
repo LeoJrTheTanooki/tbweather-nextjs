@@ -36,6 +36,10 @@ export interface Iweather {
   id: number;
   name: string;
   cod: string | number;
+  coord: {
+    lat: number;
+    lon: number;
+  }
 }
 
 export interface IForecast {

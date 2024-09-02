@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import images from "../../../public/assets/images";
 import {
   Button,
   Colors,
@@ -15,11 +14,9 @@ import {
 } from "nes-ui-react";
 
 const NavbarComponent = () => {
-  const [isClient, setIsClient] = useState<boolean>(false);
 
   const darkCheck = () => {
     // Checks if dark-mode exists in local storage, returns are to be used for the useState
-
     if (localStorage.getItem("dark-mode")) {
       // If it does, run this check to see its current state
       if (localStorage.getItem("dark-mode") === "true") {
@@ -37,9 +34,7 @@ const NavbarComponent = () => {
       setDarkMode(false);
     }
   };
-
   const [darkMode, setDarkMode] = useState<boolean>(false);
-
   const toggleDarkMode = useCallback(() => {
     setDarkMode(!darkMode);
     if (localStorage.getItem("dark-mode") === "true") {
@@ -53,7 +48,6 @@ const NavbarComponent = () => {
       localStorage.setItem("dark-mode", "true");
     }
   }, [darkMode]);
-
   useEffect(() => {
     // setIsClient(true);
     setDarkModeActivation(darkMode);
@@ -68,8 +62,14 @@ const NavbarComponent = () => {
         // Experimented using hexes to adjust colors
         style={
           darkMode
-            ? { backgroundColor: Colors.color0A, borderBottom: `solid 4px ${Colors.color0F}` }
-            : { backgroundColor: Colors.color3B, borderBottom: `solid 4px ${Colors.color0F}` }
+            ? {
+                backgroundColor: Colors.color0A,
+                borderBottom: `solid 4px ${Colors.color0F}`,
+              }
+            : {
+                backgroundColor: Colors.color3B,
+                borderBottom: `solid 4px ${Colors.color0F}`,
+              }
         }
         borderless
         roundedCorners={false}

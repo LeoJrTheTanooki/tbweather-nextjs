@@ -64,6 +64,7 @@ const HomePageComponent = () => {
   const [currentTime, setCurrentTime] = useState<string>("04:00 PM");
   const [savedLocales, setSavedLocales] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [loaded, isLoaded] = useState<boolean>(false);
 
   const [iconDay2, setIconDay2] = useState<string>("");
   const [iconDay3, setIconDay3] = useState<string>("");
@@ -178,6 +179,42 @@ const HomePageComponent = () => {
     return stringHour + ":" + stringMinute + amPm;
   };
 
+  const storageSearch = () => {
+    let localCheck;
+    let localIndex = -1;
+    for (let index = 0; index < savedLocales.length; index++) {
+      const element = savedLocales[index];
+      const currentWeather = {
+        name: `${weather.name}, ${weather.sys.country}`,
+        coord: {
+          lat: weather.coord.lat,
+          lon: weather.coord.lon,
+        },
+      };
+      if (JSON.stringify(element) == JSON.stringify(currentWeather)) {
+        localCheck = true;
+        localIndex = index;
+        break;
+      }
+    }
+    if (!localCheck) {
+      savedLocales.push({
+        name: `${weather.name}, ${weather.sys.country}`,
+        coord: {
+          lat: weather.coord.lat,
+          lon: weather.coord.lon,
+        },
+      });
+      localStorage.setItem("saved-locations", JSON.stringify(savedLocales));
+      setIsSaved(true);
+    } else {
+      // savedLocales.splice(localIndex, 1);
+      // localStorage.setItem("saved-locations", JSON.stringify(savedLocales));
+      setIsSaved(false);
+    }
+    setStorageDependancy(!storageDependancy);
+  };
+
   const getData = async (search: string = "Stockton") => {
     const weatherData = await getWeather(search);
     const forecastData = await getForecast(search);
@@ -221,8 +258,6 @@ const HomePageComponent = () => {
 
       setCurrentTime(timeConvert(todaysHour, todaysMinute));
 
-      // console.log(new Date((weather.dt + weather.timezone) * 1000));
-
       if (forecastDay !== todaysDay + 1) {
         forecastList.shift();
       }
@@ -254,6 +289,7 @@ const HomePageComponent = () => {
       setDtDay3((day3Data.dt + forecastData.city.timezone) * 1000);
       setDtDay4((day4Data.dt + forecastData.city.timezone) * 1000);
       setDtDay5((day5Data.dt + forecastData.city.timezone) * 1000);
+      isLoaded(true)
     } else {
       setWeather(weatherDefault);
 
@@ -295,6 +331,14 @@ const HomePageComponent = () => {
   useEffect(() => {
     console.log(savedLocales);
   }, [savedLocales]);
+
+  useEffect(() => {
+    if(loaded)
+    {
+      
+    }
+  }, [loaded])
+  
 
   return (
     <div className="grid justify-center">
@@ -355,47 +399,14 @@ const HomePageComponent = () => {
             </div>
             <div
               className="order-1 md:order-3 justify-self-end"
-              onClick={() => {
-                let localCheck;
-                for (let index = 0; index < savedLocales.length; index++) {
-                  const element = savedLocales[index];
-                  const currentWeather = {
-                    name: `${weather.name}, ${weather.sys.country}`,
-                    coord: {
-                      lat: weather.coord.lat,
-                      lon: weather.coord.lon,
-                    },
-                  };
-                  if (
-                    JSON.stringify(element) == JSON.stringify(currentWeather)
-                  ) {
-                    localCheck = true;
-                    break;
-                  }
-                }
-                if (!localCheck) {
-                  savedLocales.push({
-                    name: `${weather.name}, ${weather.sys.country}`,
-                    coord: {
-                      lat: weather.coord.lat,
-                      lon: weather.coord.lon,
-                    },
-                  });
-                  localStorage.setItem(
-                    "saved-locations",
-                    JSON.stringify(savedLocales)
-                  );
-                  setIsSaved(true)
-                } else {
-                  setIsSaved(false)
-                }
-                setStorageDependancy(!storageDependancy);
-              }}
+              onClick={storageSearch}
             >
               <a>
                 <img
                   className="h-16 w-16"
-                  src="/assets/unfavStar.png"
+                  src={
+                    isSaved ? "/assets/favStar.png" : "/assets/unfavStar.png"
+                  }
                   alt="???"
                 />
               </a>
